@@ -73,7 +73,7 @@ void add_expense()
 class Inflow: public Transaction{
     string source;
     public:
-    Inflow(string date,string source,double amount,string description):Transaction(date,description,amount)
+    Inflow(string date,string source,string description,double amount):Transaction(date,description,amount)
     {
         this->source=source.empty()?"Papa":description;
     }
@@ -88,20 +88,8 @@ class Inflow: public Transaction{
 };
 void add_inflow()
 {
-    string date,description,source;
+    string date,description;
     double amount;
-    cout<<"Enter date(DD MM YYY):";
-    cin>>date;
-    cout<<"Enter source(If other than father):";
-    cin>>source;
-    cout<<"Enter amount:";
-    cin>>amount;
-    cin.ignore();
-    cout<<"Enter description(Optional):";
-    getline(cin,description);
-    Inflow inflow(date,source,amount,description);
-    inflow.save("inflow_file.txt");
-    cout<<"Inflow added successfully"<<endl;
 }
 void view_expenses(){ return;}
 void view_flow_summary(){return ;}

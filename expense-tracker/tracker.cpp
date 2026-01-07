@@ -2,7 +2,19 @@
 #include<fstream>
 #include<string>
 #include<vector>
+#include<algorithm>
+#include<iomanip>
+#include<sstream>
+#include<cstdlib>
 using namespace std;
+string truncate(const string& text, size_t width)
+{
+    if(text.size()>width) 
+    {
+        return text.substr(0,width-4)+"....";
+    }
+    return text;
+}
 class Transaction{
     protected:
     string date;
@@ -17,7 +29,7 @@ class Transaction{
     }
     //Common getters
     string getDate() const { return date;}
-    string getDescriptiona() const{ return description; }
+    string getDescription() const{ return description; }
     double getAmount() const { return amount; }
 };
 class Expense: public Transaction{
@@ -31,7 +43,7 @@ class Expense: public Transaction{
         ofstream expfile(expense_file,ios::app);
         if(expfile)
         {
-            expfile<<date<<"\t\t\t\t\t\t"<<category<<"\t\t\t\t\t"<<amount<<"\t\t\t\t\t"<<description<<"\t\t\t\t\t"<<endl;
+            expfile<<date<<"|"<<category<<"|"<<amount<<"|"<<description<<endl;
         }
         else
         {
@@ -47,7 +59,8 @@ void add_expense()
     int category_choice;
     vector<string>categories={"Food & Grocery","Travel","Rent","Electricity","Stationery","Shopping","Lunch","Others","Miscategory"};
     cout<<"Enter date (DD MMM YYYY)";// 07 Jan 2026
-    cin>>date;
+    cin.ignore();
+    getline(cin,date);
     cout<<"\n----------Categories--------"<<endl;
     for(size_t i=0;i<categories.size();i++)
     {
@@ -75,13 +88,13 @@ class Inflow: public Transaction{
     public:
     Inflow(string date,string source,double amount,string description):Transaction(date,description,amount)
     {
-        this->source=source.empty()?"Papa":description;
+        this->source=source.empty()?"Papa":source;
     }
     void save(const string& inflow_file) const{
         ofstream flowfile(inflow_file,ios::app);
         if(flowfile)
         {
-            flowfile<<date<<"\t\t\t\t\t"<<source<<"\t\t\t\t\t"<<amount<<"\t\t\t\t\t"<<description<<endl;
+            flowfile<<date<<"|"<<source<<"|"<<amount<<"|"<<description<<endl;
         }
         flowfile.close();
     }
@@ -91,9 +104,10 @@ void add_inflow()
     string date,description,source;
     double amount;
     cout<<"Enter date(DD MM YYY):";
-    cin>>date;
+    cin.ignore();
+    getline(cin,date);
     cout<<"Enter source(If other than father):";
-    cin>>source;
+    getline(cin,source);
     cout<<"Enter amount:";
     cin>>amount;
     cin.ignore();
@@ -103,32 +117,120 @@ void add_inflow()
     inflow.save("inflow_file.txt");
     cout<<"Inflow added successfully"<<endl;
 }
-void view_expenses(){ return;}
-void view_flow_summary(){return ;}
-void save_exit(){return ;}
+void view_expenses(){
+    ifstream expfile("expense_file.txt");
+    if(!expfile)
+    {
+        cout<<"No expense records found!"<<endl;
+        return;
+    }
+    string line,date,category,description;
+    ostringstream amt;
+    double amount;
+    amt<<"Rs."<<fixed<<setprecision(2)<<amount;
+    cout<<left<<setw(15)<<"Date"<<setw(20)<<"Category"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
+    cout<<string(77,'-')<<endl;
+    //Display and read each record
+    while(getline(expfile,line)){
+        stringstream ss(line);
+        getline(ss,date,'|');
+        getline(ss,category,'|');
+        ss>>amount;
+        ss.ignore();
+        getline(ss,description);
+        cout<<left<<setw(15)<<date<<setw(20)<<category<<setw(12)<<amt.str()
+        <<setw(30)<<truncate(description,30)<<endl;
+
+    }
+    expfile.close();
+}
+void view_flow_summary(){
+    ifstream flowfile("inflow_file.txt");
+    if(!flowfile)
+    {
+        cout<<"No inflow records found!"<<endl;
+        return ;
+    }
+    string line,date,source,description;
+    ostringstream amt;
+    double amount;
+    amt<<"Rs."<<fixed<<setprecision(2)<<amount;
+    double total_amount=0;
+    cout<<left<<setw(15)<<"Date"<<setw(20)<<"Source"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
+    cout<<string(77,'-')<<endl;
+    //Read and display each record if any
+    while(getline(flowfile,line)){
+        stringstream ss(line);
+        getline(ss,date,'|');
+        getline(ss,source,'|');
+        ss>>amount;
+        ss.ignore();
+        getline(ss,description);
+        cout<<left<<setw(15)<<date<<setw(20)<<source<<setw(12)<<
+        amt.str()<<setw(30)<<truncate(description,30)<<endl;
+        total_amount+=amount;
+    }
+    cout<<string(77,'.')<<endl;
+    cout<<"Total Inflow: Rs."<<fixed<<setprecision(2)<<total_amount<<endl;
+    flowfile.close();
+}
+void save_exit()
+{
+    cout<<"\nAll data has been saved successfully."<<endl;
+    cout<<string(75,'.')<<endl;
+    exit(0);
+}
+void erase_entire_data()
+{
+    const string security_code="2274";
+    string entered_code;
+    cout<<"\nEnter security code to erase entire data: ";
+    cin>>entered_code;
+    if(entered_code==security_code)
+    {
+        ofstream expfile("expense_file.txt",ios::trunc);
+        ofstream flowfile("inflow_file.txt",ios::trunc);
+        expfile.close();
+        flowfile.close();
+        cout<<"All data erase successfully!"<<endl;
+    }
+    else
+    {
+        cout<<"Invalid security code!"<<endl;
+    }
+}
 void main_menu_bar()
 {
-    cout<<"---------------MENU-------------"<<endl;
-    cout<<"1.Add Expense\n2.Add Inflow\n3.View Expenses\n4.View Flow Summary\n5.Save & Exit"<<endl;
-    int menu_choice;
-    cout<<"Enter Operation:";
+    int menu_choice=0;
+    while(menu_choice!=6){
+        cout<<string(36,'.');
+        cout<<"MENU";
+        cout<<string(36,'.')<<endl;
+        cout<<"1.Add Expense\n2.Add Inflow\n3.View Expenses\n4.View Flow Summary\n5.Erase Entire Data\n6.Save & Exit"<<endl;
+        cout<<"Enter Operation:";
     cin>>menu_choice;
     switch(menu_choice)
     {
         case 1:
-        add_expense();
+        add_expense();break;
         case 2:
-        add_inflow();
+        add_inflow();break;
         case 3:
-        view_expenses();
+        view_expenses();break;
         case 4:
-        view_flow_summary();
+        view_flow_summary();break;
         case 5:
-        save_exit();
+        erase_entire_data();break;
+        case 6:
+        save_exit();break;
+        default:
+        cout<<"Invalid choice!"<<endl;break;
     }
-
 }
+}
+
 int main()
 {
-    
+    main_menu_bar();
+    return 0;
 }

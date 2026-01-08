@@ -58,7 +58,7 @@ void add_expense()
     double amount;
     int category_choice;
     vector<string>categories={"Food & Grocery","Travel","Rent","Electricity","Stationery","Shopping","Lunch","Others","Miscategory"};
-    cout<<"Enter date (DD MMM YYYY)";// 07 Jan 2026
+    cout<<"Enter date (DD MMM YYYY): ";// 07 Jan 2026
     cin.ignore();
     getline(cin,date);
     cout<<"\n----------Categories--------"<<endl;
@@ -103,7 +103,7 @@ void add_inflow()
 {
     string date,description,source;
     double amount;
-    cout<<"Enter date(DD MM YYY):";
+    cout<<"Enter date(DD MM YYY): ";
     cin.ignore();
     getline(cin,date);
     cout<<"Enter source(If other than father):";

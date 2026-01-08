@@ -125,10 +125,8 @@ void view_expenses(){
         return;
     }
     string line,date,category,description;
-    ostringstream amt;
-    double amount;
-    amt<<"Rs."<<fixed<<setprecision(2)<<amount;
-    cout<<left<<setw(15)<<"Date"<<setw(20)<<"Category"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
+    double amount,totoal_amount=0;
+    cout<<left<<setw(15)<<"Date"<<setw(15)<<"Category"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
     cout<<string(77,'-')<<endl;
     //Display and read each record
     while(getline(expfile,line)){
@@ -137,11 +135,15 @@ void view_expenses(){
         getline(ss,category,'|');
         ss>>amount;
         ss.ignore();
+        ostringstream amt;
+        amt<<"Rs."<<fixed<<setprecision(2)<<amount;
         getline(ss,description);
-        cout<<left<<setw(15)<<date<<setw(20)<<category<<setw(12)<<amt.str()
+        cout<<left<<setw(15)<<date<<setw(15)<<category<<setw(14)<<amt.str()
         <<setw(30)<<truncate(description,30)<<endl;
-
+        totoal_amount+=amount;
     }
+    cout<<string(77,'.')<<endl;
+    cout<<"Total Expense: Rs."<<totoal_amount<<endl;
     expfile.close();
 }
 void view_flow_summary(){
@@ -152,11 +154,9 @@ void view_flow_summary(){
         return ;
     }
     string line,date,source,description;
-    ostringstream amt;
     double amount;
-    amt<<"Rs."<<fixed<<setprecision(2)<<amount;
     double total_amount=0;
-    cout<<left<<setw(15)<<"Date"<<setw(20)<<"Source"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
+    cout<<left<<setw(15)<<"Date"<<setw(15)<<"Source"<<setw(12)<<"Amount"<<setw(30)<<"Description"<<endl;
     cout<<string(77,'-')<<endl;
     //Read and display each record if any
     while(getline(flowfile,line)){
@@ -166,7 +166,9 @@ void view_flow_summary(){
         ss>>amount;
         ss.ignore();
         getline(ss,description);
-        cout<<left<<setw(15)<<date<<setw(20)<<source<<setw(12)<<
+        ostringstream amt;
+        amt<<"Rs."<<fixed<<setprecision(2)<<amount;
+        cout<<left<<setw(15)<<date<<setw(15)<<source<<setw(14)<<
         amt.str()<<setw(30)<<truncate(description,30)<<endl;
         total_amount+=amount;
     }

@@ -194,11 +194,11 @@ void erase_entire_data()
         ofstream flowfile("inflow_file.txt",ios::trunc);
         expfile.close();
         flowfile.close();
-        cout<<"All data erase successfully!"<<endl;
+        cout<<"All data erase successfully..."<<endl;
     }
     else
     {
-        cout<<"Invalid security code!"<<endl;
+        cout<<"!!Invalid security code!!"<<endl;
     }
 }
 void main_menu_bar()

@@ -184,7 +184,7 @@ void save_exit()
 }
 void erase_entire_data()
 {
-    const string security_code="2274";
+    const string security_code="1999";
     string entered_code;
     cout<<"\nEnter security code to erase entire data: ";
     cin>>entered_code;
